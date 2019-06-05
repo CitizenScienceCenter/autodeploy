@@ -7,6 +7,9 @@ then
 fi
 
 ENVDEPLOY=$PWD/env-deploy.yaml
+mkdir -p $PWD/ran
+RAN_DIR=$PWD/ran
+
 cd $HOME/dev/uzh/$1
 source deploy/cc.deploy
 
@@ -16,30 +19,50 @@ REG=registry.citizenscience.ch
 TAG=${IMG}:${BRANCH}${GITTAG}
 URL=${REG}/${TAG}
 
+# COMMANDS
+GIT_PULL="git pull origin ${BRANCH}"
+GIT_SM="git submodule update --recursive"
 
-function pull {
-  git pull origin ${BRANCH}
-  git submodule update --recursive
+DOCKER_BUILD="sudo docker build -t ${URL} ."
+DOCKER_PUSH="sudo docker push ${URL}"
 
-}
+K8S_ENV="envsubst < ${ENVDEPLOY} > ${NAME}.deploy.yaml"
+K8S_DEL="kubectl delete -f ${NAME}.deploy.yaml"
+K8S_APPL="kubectl apply -f ${NAME}.deploy.yaml"
 
-function moduleUpdate {
-  git submodule update --remote --recursive
-}
 
-function dockerBuild {
-  sudo docker build -t ${URL} .
-  if $1; then
-    sudo docker push ${URL}
+function check {
+  eval $@
+  if [[ $? -eq 1 ]]; then
+    echo $?
+    exit 1
+  else
+    echo $@
+    return 1
   fi
 }
 
+function pull {
+  check ${GIT_PULL}
+  check ${GIT_SM}
+}
+
+function moduleUpdate {
+  check `git submodule update --remote --recursive`
+}
+
+function dockerBuild {
+  check ${DOCKER_BUILD}
+  check ${DOCKER_PUSH}
+}
+
 function deploy {
-  envsubst < ${ENVDEPLOY} > ${NAME}.deploy.yaml
-  kubectl delete -f ${NAME}.deploy.yaml
-  kubectl apply -f ${NAME}.deploy.yaml
+  check ${K8S_ENV}
+  check ${K8S_DEL}
+  check ${K8S_APPL}
   cat ${NAME}.deploy.yaml
-  rm ${NAME}.deploy.yaml
+  NOW=`date +%Y%m%d%H%M%S`
+  mv ${NAME}.deploy.yaml ${RAN_DIR}/${NAME}.${NOW}.deploy.yaml 
 }
 
 echo ${URL}
