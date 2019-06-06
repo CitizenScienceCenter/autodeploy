@@ -6,11 +6,23 @@ then
   exit 1
 fi
 
+function checkDir {
+  if [ -d $1 ]; then
+    echo "Source exists"
+  else
+    echo "Cannot find $1,exiting"
+    exit 1
+  fi
+}
+
 ENVDEPLOY=$PWD/env-deploy.yaml
 mkdir -p $PWD/ran
 RAN_DIR=$PWD/ran
+ROOTDIR=$HOME/dev/uzh
 
-cd $HOME/dev/uzh/$1
+checkDir `${ROOTDIR}/$1`
+cd ${ROOTDIR}/$1
+checkDir `${ROOTDIR}/$1/deploy/cc.deploy`
 source deploy/cc.deploy
 
 BRANCH=`git rev-parse --abbrev-ref HEAD`
@@ -29,7 +41,6 @@ DOCKER_PUSH="sudo docker push ${URL}"
 K8S_ENV="envsubst < ${ENVDEPLOY} > ${NAME}.deploy.yaml"
 K8S_DEL="kubectl delete -f ${NAME}.deploy.yaml"
 K8S_APPL="kubectl apply -f ${NAME}.deploy.yaml"
-
 
 function check {
   eval $@
