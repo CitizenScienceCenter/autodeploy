@@ -13,7 +13,7 @@ RAN_DIR=$PWD/ran
 cd $HOME/dev/uzh/$1
 source deploy/cc.deploy
 
-BRANCH=`git rev-parse --abbrev-ref HEAD`
+BRANCH=`git rev-parse --abbrev-ref HEAD | tr / _`
 GITTAG=`git rev-parse --short HEAD`
 REG=registry.citizenscience.ch
 TAG=${IMG}:${BRANCH}${GITTAG}
@@ -23,7 +23,7 @@ URL=${REG}/${TAG}
 GIT_PULL="git pull origin ${BRANCH}"
 GIT_SM="git submodule update --recursive"
 
-DOCKER_BUILD="sudo docker build -t ${URL} ."
+DOCKER_BUILD="sudo docker build --network=host -t ${URL} ."
 DOCKER_PUSH="sudo docker push ${URL}"
 
 K8S_ENV="envsubst < ${ENVDEPLOY} > ${NAME}.deploy.yaml"
@@ -44,7 +44,7 @@ function check {
 
 function pull {
   check ${GIT_PULL}
-  check ${GIT_SM}
+#  check ${GIT_SM}
 }
 
 function moduleUpdate {
