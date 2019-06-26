@@ -1,0 +1,5 @@
+To: {RECIP}
+From: {FROM}
+Subject: {SOURCE}: {SUB}
+
+{MSG}

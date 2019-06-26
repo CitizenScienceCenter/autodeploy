@@ -5,23 +5,24 @@ then
   echo "Repo not specified, specify name of repo"
   exit 1
 fi
-
+DEPLOY_DIR=$PWD
 ENVDEPLOY=$PWD/env-deploy.yaml
 mkdir -p $PWD/ran
 RAN_DIR=$PWD/ran
 
 cd $HOME/dev/uzh/$1
 source deploy/cc.deploy
-
-BRANCH=`git rev-parse --abbrev-ref HEAD | tr / _`
+RC_HOOK="https://chat.citizenscience.ch/hooks/evKcRdYH9HwCFE3Fa/ywRPgBLM9sg7Er4M3bXGDFSoWnenACDCe8JB2FqhZMFM2aGh"
+BRANCH=`git rev-parse --abbrev-ref HEAD`
+BRANCH_TAG=`git rev-parse --abbrev-ref HEAD | tr / _`
 GITTAG=`git rev-parse --short HEAD`
 REG=registry.citizenscience.ch
-TAG=${IMG}:${BRANCH}${GITTAG}
+TAG=${IMG}:${BRANCH_TAG}${GITTAG}
 URL=${REG}/${TAG}
 
 # COMMANDS
 GIT_PULL="git pull origin ${BRANCH}"
-GIT_SM="git submodule update --recursive"
+GIT_SM="git submodule update --recursive --remote"
 
 DOCKER_BUILD="sudo docker build --network=host -t ${URL} ."
 DOCKER_PUSH="sudo docker push ${URL}"
@@ -32,34 +33,40 @@ K8S_APPL="kubectl apply -f ${NAME}.deploy.yaml"
 
 
 function check {
-  eval $@
-  if [[ $? -eq 1 ]]; then
+  #eval $@
+  if [[ $1 -eq 1 ]]; then
     echo $?
+    notify ERROR $2 "'$3'"
     exit 1
   else
     echo $@
-    return 1
+    notify SUCCESS $2 "'$3'"
+    return 0
   fi
 }
 
+function notify {
+  #sendmail christopher.gwilliams@uzh.ch < ${DEPLOY_DIR}/msg.txt
+  echo `curl -X POST -H 'Content-Type: application/json' --data '{"source":"'"$TAG"'","status":"'"$1"'", "stage": "'"$2"'", "msg":"'"$3"'"}' https://chat.citizenscience.ch/hooks/evKcRdYH9HwCFE3Fa/ywRPgBLM9sg7Er4M3bXGDFSoWnenACDCe8JB2FqhZMFM2aGh`
+}
+
 function pull {
-  check ${GIT_PULL}
-#  check ${GIT_SM}
+  ${GIT_PULL} | check $? Git "PULL REPO"
 }
 
 function moduleUpdate {
-  check `git submodule update --remote --recursive`
+  ${GIT_SM} | check $? Git "Submodule Update"
 }
 
 function dockerBuild {
-  check ${DOCKER_BUILD}
-  check ${DOCKER_PUSH}
+  ${DOCKER_BUILD}  | check $? Docker "Docker Image Build"
+  ${DOCKER_PUSH} | check $? Docker "Docker Registry Push"
 }
 
 function deploy {
-  check ${K8S_ENV}
-  check ${K8S_DEL}
-  check ${K8S_APPL}
+  ${K8S_ENV} | check $? Deploy "Create K8S Deploy File"
+  ${K8S_DEL} | check $?  Deploy "Delete Current Deployment"
+  ${K8S_APPL} | check $? Deploy "Deploy Current Deployment"
   cat ${NAME}.deploy.yaml
   NOW=`date +%Y%m%d%H%M%S`
   mv ${NAME}.deploy.yaml ${RAN_DIR}/${NAME}.${NOW}.deploy.yaml 
@@ -79,6 +86,6 @@ do
   esac
   shift
 done
-
+notify SUCCESS Deploy HOORAY
 exit 0
 
