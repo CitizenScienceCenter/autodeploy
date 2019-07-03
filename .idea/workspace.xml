@@ -5,7 +5,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auto.go" beforeDir="false" afterPath="$PROJECT_DIR$/auto.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gin-bin" beforeDir="false" afterPath="$PROJECT_DIR$/gin-bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/sample.json" beforeDir="false" afterPath="$PROJECT_DIR$/test/sample.json" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -18,11 +17,20 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/auto.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="773">
-              <caret line="82" column="4" selection-start-line="82" selection-start-column="4" selection-end-line="82" selection-end-column="4" />
+            <state relative-caret-position="329">
+              <caret line="85" column="7" selection-start-line="85" selection-start-column="7" selection-end-line="85" selection-end-column="7" />
               <folding>
-                <element signature="e#14#229#0" expanded="true" />
+                <element signature="e#14#230#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/deploy.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="493">
+              <caret line="26" column="58" selection-start-line="26" selection-start-column="32" selection-end-line="26" selection-end-column="58" />
             </state>
           </provider>
         </entry>
@@ -30,15 +38,15 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test/sample.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="5" column="37" selection-start-line="5" selection-start-column="37" selection-end-line="5" selection-end-column="37" />
+            <state>
+              <caret line="5" column="39" selection-start-line="5" selection-start-column="39" selection-end-line="5" selection-end-column="39" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
   </component>
-  <component name="GOROOT" path="/nix/store/749qksf79hvn0aprcznd9bwfv550qwh3-go-1.12.1/share/go" />
+  <component name="GOROOT" path="$PROJECT_DIR$/../../tools/go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -61,10 +69,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="480" />
-    <option name="y" value="270" />
-    <option name="width" value="2880" />
-    <option name="height" value="1620" />
+    <option name="x" value="3195" />
+    <option name="y" value="30" />
+    <option name="width" value="1930" />
+    <option name="height" value="1055" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -99,7 +107,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="preferences.editor" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -114,10 +122,10 @@
     </option>
   </component>
   <component name="ToolWindowManager">
-    <frame x="480" y="270" width="3840" height="2131" extended-state="6" />
+    <frame x="3195" y="30" width="1930" height="1055" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.27350888" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.28114665" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -130,7 +138,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.32959402" />
+      <window_info anchor="bottom" id="Terminal" order="10" weight="0.28462517" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -145,17 +153,24 @@
     <entry file="file://$PROJECT_DIR$/deploy_server.go" />
     <entry file="file://$PROJECT_DIR$/test/sample.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="5" column="37" selection-start-line="5" selection-start-column="37" selection-end-line="5" selection-end-column="37" />
+        <state>
+          <caret line="5" column="39" selection-start-line="5" selection-start-column="39" selection-end-line="5" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deploy.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="493">
+          <caret line="26" column="58" selection-start-line="26" selection-start-column="32" selection-end-line="26" selection-end-column="58" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/auto.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="773">
-          <caret line="82" column="4" selection-start-line="82" selection-start-column="4" selection-end-line="82" selection-end-column="4" />
+        <state relative-caret-position="329">
+          <caret line="85" column="7" selection-start-line="85" selection-start-column="7" selection-end-line="85" selection-end-column="7" />
           <folding>
-            <element signature="e#14#229#0" expanded="true" />
+            <element signature="e#14#230#0" expanded="true" />
           </folding>
         </state>
       </provider>

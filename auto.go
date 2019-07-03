@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
-  	"os"
+	"io"
+	"os"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -59,16 +61,42 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 	hook := TravisResp{}
 	json.Unmarshal(body, &hook)
 	if strings.Compare(hook.State, "passed") == 0 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		w.Write([]byte("{data: Hook started}"))
 		fmt.Println(hook.Repository.Name)
 		// TODO handle git repo
-    initRepo(hook.Repository.Name, hook.Branch)
+    	hash := initRepo(hook.Repository.Name, hook.Branch)
+		dockerBuild(hook.Repository.Name, hook.Branch, hash)
+
 	} else {
 		log.Fatal("Tests were not successful, exiting")
 	}
 	// TODO pull from repo and specified branch
 }
 
-func initRepo(n string, b string) {
+func dockerBuild(n string, b string, h string) {
+	cmdName := "docker build ."
+	cmdArgs := strings.Fields(cmdName)
+
+	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
+	cmd.Dir = "/tmp/foo"
+	stdout, _ := cmd.StdoutPipe()
+	cmd.Start()
+	go print(stdout)
+	cmd.Wait()
+	//err := cmd.Run()
+	//log.Printf("Command finished with error: %v", err)
+}
+
+func print(stdout io.ReadCloser) {
+	r := bufio.NewReader(stdout)
+	line, _, err := r.ReadLine()
+	errHandler(err)
+	fmt.Println(string(line))
+}
+
+func initRepo(n string, b string) string {
   r, err := git.PlainClone("/tmp/foo", false, &git.CloneOptions{
     URL:      "https://github.com/citizensciencecenter/" + n,
     Progress: os.Stdout,
@@ -80,18 +108,33 @@ func initRepo(n string, b string) {
   } else {
   	fmt.Printf("Repo checked out")
   }
-	fmt.Println("Repo opened")
+
+  //target, err := r.Branch(b)
+  branches, _ := r.References()
+  var target plumbing.ReferenceName
+	for {
+		v, err := branches.Next()
+		errHandler(err)
+		if strings.Contains(v.Name().String(), b) {
+			target = v.Name()
+			fmt.Println(target)
+			break
+		}
+	}
+  errHandler(err)
   w, err := r.Worktree()
   errHandler(err)
   err = w.Checkout(&git.CheckoutOptions{
-  	Branch: plumbing.ReferenceName(b),
+  	Branch: target,
   	Force: true,
   })
+  errHandler(err)
   err = w.Pull(&git.PullOptions{RemoteName: "origin", RecurseSubmodules: git.DefaultSubmoduleRecursionDepth})
   ref, err := r.Head()
   errHandler(err)
   commit, err := r.CommitObject(ref.Hash())
   fmt.Println(commit)
+  return ref.Hash().String()
 }
 
 func runCommand(cmd string) {
