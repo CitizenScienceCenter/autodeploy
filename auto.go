@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-  "os"
+  	"os"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 	"gopkg.in/src-d/go-git.v4"
-  "gopkg.in/src-d/go-git.v4/plumbing"
+  	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 type TravisResp struct {
@@ -55,7 +55,7 @@ func runHookServer() {
 func HookHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO check token is matching
 	body, err := ioutil.ReadAll(r.Body)
-  errHandler(err)
+  	errHandler(err)
 	hook := TravisResp{}
 	json.Unmarshal(body, &hook)
 	if strings.Compare(hook.State, "passed") == 0 {
@@ -72,13 +72,26 @@ func initRepo(n string, b string) {
   r, err := git.PlainClone("/tmp/foo", false, &git.CloneOptions{
     URL:      "https://github.com/citizensciencecenter/" + n,
     Progress: os.Stdout,
+    RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
   })
-	errHandler(err)
+  if err == git.ErrRepositoryAlreadyExists {
+	r, err = git.PlainOpen("/tmp/foo")
+	fmt.Println("Repo opened")
+  } else {
+  	fmt.Printf("Repo checked out")
+  }
+	fmt.Println("Repo opened")
   w, err := r.Worktree()
   errHandler(err)
-	err = w.Checkout(&git.CheckoutOptions{
-		Branch: plumbing.ReferenceName(b),
-	})
+  err = w.Checkout(&git.CheckoutOptions{
+  	Branch: plumbing.ReferenceName(b),
+  	Force: true,
+  })
+  err = w.Pull(&git.PullOptions{RemoteName: "origin", RecurseSubmodules: git.DefaultSubmoduleRecursionDepth})
+  ref, err := r.Head()
+  errHandler(err)
+  commit, err := r.CommitObject(ref.Hash())
+  fmt.Println(commit)
 }
 
 func runCommand(cmd string) {
