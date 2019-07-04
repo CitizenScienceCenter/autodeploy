@@ -1,0 +1,7 @@
+{
+  "REPO_DIR": "/home/encima",
+  "DOCKER": {
+      "REGISTRY": "registry.citizenscience.ch"
+  },
+  "STDOUT": true
+}

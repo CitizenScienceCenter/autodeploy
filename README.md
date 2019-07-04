@@ -30,5 +30,10 @@ the repo to deploy into Kubernetes using `envsubst` (not Helm)
 
 ## TODO
 
-* [ ] Handle args for config paths
+* [X] Handle args for config paths
 * [ ] Allow selection of default build steps
+* [ ] Git - handle initialising submodules
+* [ ] Git -  fetch branches before searching
+* [ ] Docker - Print errors to users when command fails
+* [x] Config - enable or disable stdout
+* [ ] K8S - create env file and pass to deploy
