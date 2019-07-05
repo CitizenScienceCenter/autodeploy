@@ -82,8 +82,9 @@ func dockerBuild(t string) {
 }
 
 func dockerPush(t string) {
-	dockerCmd := fmt.Sprintf("docker push -t %s", t)
+	dockerCmd := fmt.Sprintf("docker push %s", t)
 	fmt.Println(dockerCmd)
+  runCommand(dockerCmd)
 }
 func envCreate(t TravisResp, hash string) {
 	// TODO create temp env file based on travis reponse
@@ -132,12 +133,15 @@ func initRepo(n string, b string) {
 		Branch: target,
 		Force:  true,
 	})
-	s, err := w.Submodules()
+	//s, err := w.Submodules()
+  runCommand("git submodule init")
+  runCommand("git submodule update --remote --recursive")
+  /*s.Init()
 	s.Update(&git.SubmoduleUpdateOptions{
 		Init:              true,
 		NoFetch:           false,
 		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
-	})
+	})*/
   fmt.Println("Updated submodules")
 	err = w.Pull(&git.PullOptions{RemoteName: "origin", RecurseSubmodules: git.DefaultSubmoduleRecursionDepth})
 	ref, err := r.Head()
