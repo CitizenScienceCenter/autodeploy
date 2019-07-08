@@ -154,7 +154,7 @@ func initRepo(n string, b string) {
 	go dockerBuild(tag)
 }
 
-func runCommand(cmdString string, fin string) {
+func runCommand(cmdString string, msg ...string) {
 	cmdArgs := strings.Fields(cmdString)
 
 	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
@@ -174,7 +174,9 @@ func runCommand(cmdString string, fin string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-  fmt.Println(fin)
+  if len(msg) > 0 {
+    fmt.Println(msg[0])
+  }
 }
 
 func notify() {
