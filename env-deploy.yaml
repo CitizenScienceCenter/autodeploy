@@ -58,7 +58,7 @@ spec:
   - hosts:
     - ${HOST}
     - www.${HOST}
-    secretName: tls-certificate-secret
+    secretName: ${HOST}
   rules:
   - host: ${HOST}
     http:
