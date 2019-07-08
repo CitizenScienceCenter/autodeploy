@@ -77,14 +77,14 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 func dockerBuild(t string) {
 	dockerCmd := fmt.Sprintf("docker build -t %s .", t)
 	fmt.Println(dockerCmd)
-	runCommand(dockerCmd)
+	runCommand(dockerCmd, "Image built successfully")
 	go dockerPush(t)
 }
 
 func dockerPush(t string) {
 	dockerCmd := fmt.Sprintf("docker push %s", t)
 	fmt.Println(dockerCmd)
-  runCommand(dockerCmd)
+  runCommand(dockerCmd, "Image pushed to registry")
 }
 func envCreate(t TravisResp, hash string) {
 	// TODO create temp env file based on travis reponse
@@ -134,8 +134,8 @@ func initRepo(n string, b string) {
 		Force:  true,
 	})
 	//s, err := w.Submodules()
-  runCommand("git submodule init")
-  runCommand("git submodule update --remote --recursive")
+  runCommand("git submodule init", "Submodules initialised")
+  runCommand("git submodule update --remote --recursive", "Submodules updated")
   /*s.Init()
 	s.Update(&git.SubmoduleUpdateOptions{
 		Init:              true,
@@ -154,7 +154,7 @@ func initRepo(n string, b string) {
 	go dockerBuild(tag)
 }
 
-func runCommand(cmdString string) {
+func runCommand(cmdString string, fin string) {
 	cmdArgs := strings.Fields(cmdString)
 
 	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
@@ -174,6 +174,7 @@ func runCommand(cmdString string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+  fmt.Println(fin)
 }
 
 func notify() {
