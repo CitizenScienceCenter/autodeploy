@@ -1,0 +1,14 @@
+{
+    "REPO_DIR": "/home/encima",
+    "DOCKER": {
+        "REGISTRY": "registry.citizenscience.ch"
+    },
+    "GIT": {
+      "BASE_URL": "https.github.com/citizensciencecenter"
+    },
+    "STDOUT": true,
+    "WEBHOOK": {
+      "URL": "https://chat.citizenscience.ch/hooks/evKcRdYH9HwCFE3Fa/ywRPgBLM9sg7Er4M3bXGDFSoWnenACDCe8JB2FqhZMFM2aGh"
+    }
+  }
+  
