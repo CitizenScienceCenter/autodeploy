@@ -1,27 +1,42 @@
 package modules
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/spf13/viper"
 )
 
-func notify() {
-	req, err := http.NewRequest("POST", "", nil)
-	if err != nil {
-		panic(err)
-	}
+// HookBody webhook payload for the webhook
+type HookBody struct {
+	Source string
+	Status string
+	Stage  string
+	Msg    string
+}
+
+// AutoDeploy to hold the loaded config and the hook data that is updated at each stage
+type AutoDeploy struct {
+	Config   *viper.Viper
+	HookBody HookBody
+}
+
+// Notify sends hook details to your endpoint of choice
+func Notify(ad AutoDeploy) {
+	body, err := json.Marshal(ad.HookBody)
+	fmt.Println(string(body))
+	ErrHandler(err)
+	url := ad.Config.GetString("webhook.url")
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
+	ErrHandler(err)
 	req.Header.Add("Accept", "application/json")
 	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		//handle response error
-	}
+	ErrHandler(err)
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		//handle read response error
-	}
-
+	body, err = ioutil.ReadAll(resp.Body)
+	ErrHandler(err)
 	fmt.Printf("%s\n", string(body))
 }

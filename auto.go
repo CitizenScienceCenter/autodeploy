@@ -13,31 +13,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// TravisResp webhook payload coming from Travis CI when the testing has been completed
-type TravisResp struct {
-	Repository Repo
-	Branch     string
-	State      string
-	Commit     string
-	BuildURL   string
-	CompareURL string
-	Number     int
-}
-
-// Repo contains the ownership info of the repository coming from Travis
-type Repo struct {
-	Name      string
-	OwnerName string
-}
-
-// RocketChat webhook payload for the webhook
-type RocketChat struct {
-	source string
-	status string
-	stage  string
-	msg    string
-}
-
 func loadConfig() {
 	viper.SetConfigType("json")
 	viper.SetConfigFile("./config/conf.json")
@@ -54,38 +29,30 @@ func runHookServer() {
 	log.Fatal(http.ListenAndServe(":9898", r))
 }
 
-func sendHook(msg string, stage string) {
-	// hookMsg := RocketChat{msg, stage, "", ""}
-}
-
 func hookHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO check token is matching
 	body, err := ioutil.ReadAll(r.Body)
 	modules.ErrHandler(err)
-	hook := TravisResp{}
+	hook := modules.TravisResp{}
 	json.Unmarshal(body, &hook)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write([]byte("{data: Hook started}"))
-	//return
-	// TODO start a channel here to perform the build
-	if strings.Compare(hook.State, "passed") == 0 {
-		fmt.Println(hook.Repository.Name)
-		go modules.InitRepo(hook.Repository.Name, hook.Branch)
-	} else {
-		log.Fatal("Tests were not successful, exiting")
-	}
-	// TODO pull from repo and specified branch
-}
 
-func envCreate(t TravisResp, hash string) {
-	// TODO create temp env file based on travis reponse
-	// i.e. develop branch is the staging namespace
-	// NAME = repo name
-	// NS = branch
-	// HOST = NAME + NS (unless NS is prod)
-	// TAG = branch + git hash
-	// PORT = how to define? Default port? Read from Dockerfile?
+	src := fmt.Sprintf("%s:%s", hook.Repository.Name, hook.Branch)
+	rc := modules.HookBody{Source: src, Status: "SUCCESS", Stage: "Hook Triggered", Msg: "Hook started"}
+	ad := modules.AutoDeploy{Config: viper.GetViper(), HookBody: rc}
+	if strings.Compare(hook.State, "passed") == 0 {
+		modules.Notify(ad)
+		w.WriteHeader(200)
+		w.Write([]byte("{data: Hook started}"))
+		go modules.InitRepo(hook.Repository.Name, hook.Branch, ad)
+	} else {
+		ad.HookBody.Stage = "Travis"
+		ad.HookBody.Status = "FAILED"
+		ad.HookBody.Msg = "Tests Failed"
+		modules.Notify(ad)
+		w.WriteHeader(500)
+		w.Write([]byte("{data: Hook Failed}"))
+	}
 }
 
 func main() {

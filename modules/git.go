@@ -11,7 +11,7 @@ import (
 )
 
 // InitRepo clones or updates a repo based on the branch info coming from Travis
-func InitRepo(n string, b string) {
+func InitRepo(n string, b string, ad AutoDeploy) {
 	r, err := git.PlainClone("/tmp/foo", false, &git.CloneOptions{
 		URL:               "https://github.com/citizensciencecenter/" + n,
 		Progress:          os.Stdout,
@@ -49,8 +49,8 @@ func InitRepo(n string, b string) {
 		Force:  true,
 	})
 	//s, err := w.Submodules()
-	RunCommand("git submodule init", "Submodules initialised")
-	RunCommand("git submodule update --remote --recursive", "Submodules updated")
+	RunCommand("git submodule init", ad, "Submodules initialised")
+	RunCommand("git submodule update --remote --recursive", ad, "Submodules updated")
 	/*s.Init()
 	s.Update(&git.SubmoduleUpdateOptions{
 		Init:              true,
@@ -66,5 +66,8 @@ func InitRepo(n string, b string) {
 	dockerURL := viper.GetString("docker.registry")
 	branchFmt := strings.ReplaceAll(b, "/", "_")
 	tag := fmt.Sprintf("%s/%s:%s%s", dockerURL, n, branchFmt, hash)
-	go dockerBuild(tag)
+	ad.HookBody.Stage = "Git Pull"
+	ad.HookBody.Status = "SUCCESS"
+	Notify(ad)
+	go dockerBuild(tag, ad)
 }

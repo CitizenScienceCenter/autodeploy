@@ -10,6 +10,23 @@ import (
 	"github.com/spf13/viper"
 )
 
+// TravisResp webhook payload coming from Travis CI when the testing has been completed
+type TravisResp struct {
+	Repository Repo
+	Branch     string
+	State      string
+	Commit     string
+	BuildURL   string
+	CompareURL string
+	Number     int
+}
+
+// Repo contains the ownership info of the repository coming from Travis
+type Repo struct {
+	Name      string
+	OwnerName string
+}
+
 // ErrHandler is the one function we all hate to write
 func ErrHandler(err error) {
 	if err != nil {
@@ -18,9 +35,8 @@ func ErrHandler(err error) {
 }
 
 // RunCommand runs the specified command in a shell and **can** pipe the output
-func RunCommand(cmdString string, msg ...string) {
+func RunCommand(cmdString string, ad AutoDeploy, msg ...string) {
 	cmdArgs := strings.Fields(cmdString)
-
 	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
 	stdout, _ := cmd.StdoutPipe()
 	cmd.Dir = "/tmp/foo"
@@ -37,8 +53,16 @@ func RunCommand(cmdString string, msg ...string) {
 	cmd.Wait()
 	if err != nil {
 		log.Fatal(err)
+		ad.HookBody.Status = "FAILED"
+		ad.HookBody.Stage = msg[0]
+		ad.HookBody.Msg = msg[1]
+		Notify(ad)
 	}
-	if len(msg) > 0 {
+	if len(msg) == 2 {
 		fmt.Println(msg[0])
+		ad.HookBody.Status = "SUCCESS"
+		ad.HookBody.Stage = msg[0]
+		ad.HookBody.Msg = msg[1]
+		Notify(ad)
 	}
 }
