@@ -22,6 +22,8 @@ type HookBody struct {
 type AutoDeploy struct {
 	Config   *viper.Viper
 	HookBody HookBody
+	Travis   TravisResp
+	Hash     string
 }
 
 // Notify sends hook details to your endpoint of choice

@@ -5,7 +5,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/spf13/viper"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
@@ -35,7 +34,6 @@ func InitRepo(n string, b string, ad AutoDeploy) {
 	for {
 		v, err := branches.Next()
 		ErrHandler(err)
-		fmt.Println(v)
 		if strings.Contains(v.Name().String(), b) {
 			target = v.Name()
 			fmt.Println(target)
@@ -49,8 +47,8 @@ func InitRepo(n string, b string, ad AutoDeploy) {
 		Force:  true,
 	})
 	//s, err := w.Submodules()
-	RunCommand("git submodule init", ad, "Submodules initialised")
-	RunCommand("git submodule update --remote --recursive", ad, "Submodules updated")
+	RunCommand("git submodule init", &ad, "/tmp/foo", []string{}, "Submodules initialised")
+	RunCommand("git submodule update --remote --recursive", &ad, "/tmp/foo", []string{}, "Submodules updated")
 	/*s.Init()
 	s.Update(&git.SubmoduleUpdateOptions{
 		Init:              true,
@@ -63,9 +61,10 @@ func InitRepo(n string, b string, ad AutoDeploy) {
 	commit, err := r.CommitObject(ref.Hash())
 	fmt.Println(commit)
 	hash := ref.Hash().String()
-	dockerURL := viper.GetString("docker.registry")
+	// dockerURL := viper.GetString("docker.registry")
 	branchFmt := strings.ReplaceAll(b, "/", "_")
-	tag := fmt.Sprintf("%s/%s:%s%s", dockerURL, n, branchFmt, hash)
+	ad.Hash = hash
+	tag := fmt.Sprintf("%s:%s%s", n, branchFmt, hash)
 	ad.HookBody.Stage = "Git Pull"
 	ad.HookBody.Status = "SUCCESS"
 	Notify(ad)

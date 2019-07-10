@@ -5,14 +5,15 @@ import (
 )
 
 func dockerBuild(t string, ad AutoDeploy) {
-	dockerCmd := fmt.Sprintf("docker build -t %s .", t)
+	dockerCmd := fmt.Sprintf("docker build -t %s/%s .", ad.Config.GetString("docker.registry"), t)
 	fmt.Println(dockerCmd)
-	RunCommand(dockerCmd, ad, "Docker Build", "Image built successfully")
+	RunCommand(dockerCmd, &ad, "/tmp/foo", []string{}, "Docker Build", "Image built successfully")
 	go dockerPush(t, ad)
 }
 
 func dockerPush(t string, ad AutoDeploy) {
-	dockerCmd := fmt.Sprintf("docker push %s", t)
+	dockerCmd := fmt.Sprintf("docker push %s/%s", ad.Config.GetString("docker.registry"), t)
 	fmt.Println(dockerCmd)
-	RunCommand(dockerCmd, ad, "Docker Push", "Image pushed to registry")
+	RunCommand(dockerCmd, &ad, "/tmp/foo", []string{}, "Docker Push", "Image pushed to registry")
+	go envCreate(t, ad)
 }

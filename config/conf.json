@@ -11,13 +11,14 @@
       "URL": "https://chat.citizenscience.ch/hooks/evKcRdYH9HwCFE3Fa/ywRPgBLM9sg7Er4M3bXGDFSoWnenACDCe8JB2FqhZMFM2aGh"
     },
     "K8S": {
-        "YAML": "./env-deploy.yaml",
+        "YAML": "/home/encima/go/src/github.com/citizensciencecenter/autodeploy/env-deploy.yaml",
         "DEPLOY": {
             "DEP": true,
             "SVC": true,
             "ING": true,
             "ING-WWW": true
-        }
+        },
+        "HOST": ".citizenscience.ch"
     }
   }
   

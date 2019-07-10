@@ -39,7 +39,7 @@ func hookHandler(w http.ResponseWriter, r *http.Request) {
 
 	src := fmt.Sprintf("%s:%s", hook.Repository.Name, hook.Branch)
 	rc := modules.HookBody{Source: src, Status: "SUCCESS", Stage: "Hook Triggered", Msg: "Hook started"}
-	ad := modules.AutoDeploy{Config: viper.GetViper(), HookBody: rc}
+	ad := modules.AutoDeploy{Config: viper.GetViper(), HookBody: rc, Travis: hook}
 	if strings.Compare(hook.State, "passed") == 0 {
 		modules.Notify(ad)
 		w.WriteHeader(200)

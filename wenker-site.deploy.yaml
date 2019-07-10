@@ -1,50 +1,50 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{.NAME}}
-  namespace: {{.NS}}
+  name: wenker-site
+  namespace: c3s-test
   labels:
-    app: {{.NAME}}-app
+    app: wenker-site-app
 spec:
   replicas: 1
   strategy:
     type: RollingUpdate
   selector:
     matchLabels:
-      app: {{.NAME}}-app
+      app: wenker-site-app
   template:
     metadata:
       labels:
-        app: {{.NAME}}-app
+        app: wenker-site-app
     spec:
       containers:
       - name: nginx
         imagePullPolicy: Always
-        image: {{.TAG}}
+        image: registry.citizenscience.ch/wenker-site:feature_elvira-changesbd4f47272d99890b86f72595e2e039c41d10ed07
         ports:
-        - containerPort: {{.PORT}}
+        - containerPort: 80
       imagePullSecrets:
       - name: regcred
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.NAME}}-service
-  namespace: {{.NS}}
+  name: wenker-site-service
+  namespace: c3s-test
 spec:
   selector:
-    app: {{.NAME}}-app
+    app: wenker-site-app
   ports:
     - name: http
       protocol: 'TCP'
       port: 80
-      targetPort: {{.PORT}}
+      targetPort: 80
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{.NAME}}-ingress
-  namespace: {{.NS}}
+  name: wenker-site-ingress
+  namespace: c3s-test
   annotations:
     #nginx.ingress.kubernetes.io/rewrite-target: /$2
     #nginx.ingress.kubernetes.io/configuration-snippet: |
@@ -56,21 +56,21 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{.HOST}}
-    - www.{{.HOST}}
-    secretName: {{.HOST}}
+    - wenker-site-test.citizenscience.ch
+    - www.wenker-site-test.citizenscience.ch
+    secretName: wenker-site-test.citizenscience.ch
   rules:
-  - host: {{.HOST}}
+  - host: wenker-site-test.citizenscience.ch
     http:
       paths:
       - path: "/"
         backend:
-          serviceName: {{.NAME}}-service
+          serviceName: wenker-site-service
           servicePort: http
-  - host: www.{{.HOST}}
+  - host: www.wenker-site-test.citizenscience.ch
     http:
       paths:
       - path: "/"
         backend:
-          serviceName: {{.NAME}}-service
+          serviceName: wenker-site-service
           servicePort: http

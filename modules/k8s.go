@@ -1,40 +1,50 @@
 package modules
 
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+	"html/template"
+	"io/ioutil"
+)
 
-type env struct {
-	Key   string
-	Value string
+type vars struct {
+	NAME string
+	PORT int
+	NS   string
+	HOST string
+	TAG  string
 }
 
-func envCreate(ad AutoDeploy, t TravisResp, hash string) {
-	template := ad.Config.GetString("k8s.yaml")
-
-	envCmd := fmt.Sprintf("envsubst < %s > %s.deploy.yaml", template, t.Repository.Name)
-	RunCommand(envCmd, ad, "K8S", "Created YAML Deployment")
+func envCreate(t string, ad AutoDeploy) {
 	var namespace string
-	switch t.Branch {
+	var host string
+	switch ad.Travis.Branch {
 	case "master":
 		namespace = "c3s-prod"
+		host = ""
 		break
 	case "develop":
 		namespace = "c3s-test"
+		host = "-test"
 		break
 	default:
+		namespace = "c3s-test"
+		host = "-test"
 		break
 	}
-	exportEnv(env{"NAME", t.Repository.Name}, env{"HOST", t.Repository.Name}, env{"TAG", hash}, env{"TAG", "8080"}, env{"NS", NS})
-	deployCmd := fmt.Sprintf("kubectl apply -f %s.deploy.yaml", t.Repository.Name)
-	RunCommand(deployCmd, ad, "K8S", "Deployment successful")
-	// TODO create temp env file based on travis reponse
-	// i.e. develop branch is the staging namespace
-	// NAME = repo name
-	// NS = branch
-	// HOST = NAME + NS (unless NS is prod)
-	// TAG = branch + git hash
-	// PORT = how to define? Default port? Read from Dockerfile?
-}
-
-func exportEnv(vars ...env) {
-
+	var envVar vars
+	envVar.NAME = ad.Travis.Repository.Name
+	envVar.PORT = 80
+	envVar.NS = namespace
+	envVar.TAG = fmt.Sprintf("%s/%s", ad.Config.GetString("docker.registry"), t)
+	envVar.HOST = fmt.Sprintf("%s%s%s", ad.Travis.Repository.Name, host, ad.Config.GetString("k8s.host"))
+	yamlTemplate := template.Must(template.ParseFiles(ad.Config.GetString("k8s.yaml")))
+	var writer bytes.Buffer
+	err := yamlTemplate.Execute(&writer, envVar)
+	ErrHandler(err)
+	outFile := fmt.Sprintf("%s.deploy.yaml", ad.Travis.Repository.Name)
+	err = ioutil.WriteFile(outFile, writer.Bytes(), 0644)
+	ErrHandler(err)
+	deployCmd := fmt.Sprintf("kubectl apply -f %s.deploy.yaml", ad.Travis.Repository.Name)
+	RunCommand(deployCmd, &ad, "", []string{}, "K8S", "Created YAML Deployment")
 }
