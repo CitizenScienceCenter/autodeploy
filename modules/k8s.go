@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"os"
 )
 
 type vars struct {
@@ -42,9 +43,15 @@ func envCreate(t string, ad AutoDeploy) {
 	var writer bytes.Buffer
 	err := yamlTemplate.Execute(&writer, envVar)
 	ErrHandler(err)
-	outFile := fmt.Sprintf("%s.deploy.yaml", ad.Travis.Repository.Name)
+	outFile := fmt.Sprintf("deployments/%s.deploy.yaml", ad.Travis.Repository.Name)
 	err = ioutil.WriteFile(outFile, writer.Bytes(), 0644)
 	ErrHandler(err)
-	deployCmd := fmt.Sprintf("kubectl apply -f %s.deploy.yaml", ad.Travis.Repository.Name)
-	RunCommand(deployCmd, &ad, "", []string{}, "K8S", "Created YAML Deployment")
+	deployCmd := fmt.Sprintf("kubectl apply -f deployments/%s.deploy.yaml", ad.Travis.Repository.Name)
+	cwd, err := os.Getwd()
+	ErrHandler(err)
+	RunCommand(deployCmd, &ad, cwd, []string{}, "K8S", "Created YAML Deployment")
+	ad.HookBody.Status = "SUCCESS"
+	ad.HookBody.Msg = "DEPLOYED"
+	ad.HookBody.Stage = "Hook Finished"
+	Notify(ad)
 }

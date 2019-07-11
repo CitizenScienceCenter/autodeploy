@@ -11,25 +11,32 @@ import (
 
 // InitRepo clones or updates a repo based on the branch info coming from Travis
 func InitRepo(n string, b string, ad AutoDeploy) {
-	dir := ad.Config.GetString("git.repo_dir") + ad.Travis.Repository.Name
-	r, err := git.PlainClone(dir, false, &git.CloneOptions{
+	fmt.Println(ad.Dir)
+	//ad.Dir = "/tmp/foo"
+	repoURL := "https://github.com/citizensciencecenter/" + n
+	fmt.Println(repoURL)
+	r, err := git.PlainClone(ad.Dir, false, &git.CloneOptions{
 		URL:               "https://github.com/citizensciencecenter/" + n,
 		Progress:          os.Stdout,
 		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
 	})
-	fmt.Println(err)
+	//ErrHandler(err)
+	fmt.Println(n)
 	if err == git.ErrRepositoryAlreadyExists {
-		r, err = git.PlainOpen(dir)
+		r, err = git.PlainOpen(ad.Dir)
 		fmt.Println("Repo opened")
 	} else {
-		fmt.Printf("Repo checked out")
+		ErrHandler(err)
+		fmt.Println("Repo checked out")
 	}
 	// TODO allow this to be configured?
 	err = r.Fetch(&git.FetchOptions{
 		RemoteName: "origin",
 	})
+	//ErrHandler(err)
 	fmt.Println("Fetched remotes")
-	branches, _ := r.References()
+	branches, err := r.References()
+	ErrHandler(err)
 	fmt.Println("Searching references")
 	var target plumbing.ReferenceName
 	for {
@@ -48,8 +55,7 @@ func InitRepo(n string, b string, ad AutoDeploy) {
 		Force:  true,
 	})
 	//s, err := w.Submodules()
-	RunCommand("git submodule init", &ad, dir, []string{}, "Submodules initialised")
-	RunCommand("git submodule update --remote --recursive", &ad, dir, []string{}, "Submodules updated")
+	RunCommand("git submodule init", &ad, ad.Dir, []string{}, "Submodules initialised")
 	/*s.Init()
 	s.Update(&git.SubmoduleUpdateOptions{
 		Init:              true,
@@ -58,6 +64,7 @@ func InitRepo(n string, b string, ad AutoDeploy) {
 	})*/
 	fmt.Println("Updated submodules")
 	err = w.Pull(&git.PullOptions{RemoteName: "origin", RecurseSubmodules: git.DefaultSubmoduleRecursionDepth})
+	RunCommand("git submodule update --remote --recursive", &ad, ad.Dir, []string{}, "Submodules updated")
 	ref, err := r.Head()
 	commit, err := r.CommitObject(ref.Hash())
 	fmt.Println(commit)

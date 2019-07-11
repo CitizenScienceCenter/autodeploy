@@ -20,7 +20,7 @@ spec:
       containers:
       - name: nginx
         imagePullPolicy: Always
-        image: registry.citizenscience.ch/wenker-site:feature_elvira-changes4cd2d75f2ba15a40cdc6ac5c95a0613ec0a25338
+        image: registry.citizenscience.ch/wenker-site:feature_elvira-changes0666768cf1e64acd6269bd6cb9f9403ed23e0497
         ports:
         - containerPort: 80
       imagePullSecrets:

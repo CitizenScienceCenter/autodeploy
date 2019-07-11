@@ -3,8 +3,8 @@
         "REGISTRY": "registry.citizenscience.ch"
     },
     "GIT": {
-      "BASE_URL": "https.github.com/citizensciencecenter",
-      "REPO_DIR": ""
+      "BASE_URL": "https://github.com/citizensciencecenter",
+      "REPO_DIR": "/tmp"
     },
     "STDOUT": true,
     "WEBHOOK": {
