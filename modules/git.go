@@ -11,14 +11,15 @@ import (
 
 // InitRepo clones or updates a repo based on the branch info coming from Travis
 func InitRepo(n string, b string, ad AutoDeploy) {
-	r, err := git.PlainClone("/tmp/foo", false, &git.CloneOptions{
+	dir := ad.Config.GetString("git.repo_dir") + ad.Travis.Repository.Name
+	r, err := git.PlainClone(dir, false, &git.CloneOptions{
 		URL:               "https://github.com/citizensciencecenter/" + n,
 		Progress:          os.Stdout,
 		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
 	})
 	fmt.Println(err)
 	if err == git.ErrRepositoryAlreadyExists {
-		r, err = git.PlainOpen("/tmp/foo")
+		r, err = git.PlainOpen(dir)
 		fmt.Println("Repo opened")
 	} else {
 		fmt.Printf("Repo checked out")
@@ -47,8 +48,8 @@ func InitRepo(n string, b string, ad AutoDeploy) {
 		Force:  true,
 	})
 	//s, err := w.Submodules()
-	RunCommand("git submodule init", &ad, "/tmp/foo", []string{}, "Submodules initialised")
-	RunCommand("git submodule update --remote --recursive", &ad, "/tmp/foo", []string{}, "Submodules updated")
+	RunCommand("git submodule init", &ad, dir, []string{}, "Submodules initialised")
+	RunCommand("git submodule update --remote --recursive", &ad, dir, []string{}, "Submodules updated")
 	/*s.Init()
 	s.Update(&git.SubmoduleUpdateOptions{
 		Init:              true,

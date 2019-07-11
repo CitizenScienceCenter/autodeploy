@@ -24,6 +24,7 @@ type AutoDeploy struct {
 	HookBody HookBody
 	Travis   TravisResp
 	Hash     string
+	Dir string
 }
 
 // Notify sends hook details to your endpoint of choice
