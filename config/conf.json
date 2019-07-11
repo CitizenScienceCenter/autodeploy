@@ -4,7 +4,7 @@
         "REGISTRY": "registry.citizenscience.ch"
     },
     "GIT": {
-      "BASE_URL": "https.github.com/citizensciencecenter"
+      "BASE_URL": "https://github.com/citizensciencecenter"
     },
     "STDOUT": true,
     "WEBHOOK": {
