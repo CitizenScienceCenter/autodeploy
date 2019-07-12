@@ -54,7 +54,9 @@ func envCreate(t string, ad AutoDeploy) {
 	cwd, err := os.Getwd()
 	ErrHandler(err)
 	fmt.Println(cwd)
-	RunCommand(deployCmd, &ad, cwd, []string{}, "K8S", "Created YAML Deployment")
+	envs := make([]string, 1)
+	envs[0] = "KUBECONFIG=/home/encima/.kube/config"
+	RunCommand(deployCmd, &ad, cwd, envs, "K8S", "Created YAML Deployment")
 	ad.HookBody.Status = "SUCCESS"
 	ad.HookBody.Msg = "DEPLOYED"
 	ad.HookBody.Stage = "Hook Finished"
