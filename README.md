@@ -28,12 +28,37 @@ the repo to deploy into Kubernetes using `envsubst` (not Helm)
 5. Deploy to K8S and save output of file to `ran` folder
 6. Notify webhook of success and failures
 
+## Troubleshooting
+
+### Git fails with `SSH_AUTH_SOCK`
+
+This is probably because your shell cannot find the ssh-agent or the path to the socket file is wrong.
+
+#### To Fix
+
+```bash
+$ eval `ssh-agent`
+$ ssh-add
+```
+
+### Docker fails to build
+
+Probably you need to add your user to the Docker group or, and this is **NOT** recommended, you can run as sudo
+
+### Docker fails to push to a registry
+
+First, make sure you have a registry set and then make sure your auth credentials have been provided with:
+
+`$ docker login <REGISTRY>`
+
 ## TODO
 
 * [X] Handle args for config paths
 * [ ] Allow selection of default build steps
-* [ ] Git - handle initialising submodules
-* [ ] Git -  fetch branches before searching
+* [X] Git - handle initialising submodules
+* [X] Git -  fetch branches before searching
 * [ ] Docker - Print errors to users when command fails
-* [x] Config - enable or disable stdout
-* [ ] K8S - create env file and pass to deploy
+* [X] Config - enable or disable stdout
+* [X] K8S - create env file and pass to deploy
+* [X] Webhook - Notification of stages
+* [ ] Better error handling and detection, no silent failures

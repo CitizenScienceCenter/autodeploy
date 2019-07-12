@@ -6,28 +6,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/citizensciencecenter/autodeploy/modules"
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 )
-
-func loadConfig() {
-	viper.SetConfigType("json")
-	viper.SetConfigFile("./config/conf.json")
-	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil {             // Handle errors reading the config file
-		panic(fmt.Errorf("Fatal error config file: %s", err))
-	}
-	if viper.GetString("git.repo_dir") == "" {
-		cwd, err := os.Getwd()
-		modules.ErrHandler(err)
-		viper.Set("git.repo_dir", cwd)
-	}
-
-}
 
 func runHookServer() {
 	r := mux.NewRouter()
@@ -64,6 +48,6 @@ func hookHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	loadConfig()
+	modules.LoadConfig("./config/conf.json")
 	runHookServer()
 }

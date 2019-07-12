@@ -18,6 +18,11 @@
             "ING": true,
             "ING-WWW": true
         },
+        "SPACES": {
+            "PROD": "c3s-prod",
+            "STAGING": "c3s-staging",
+            "TEST": "c3s-testz"
+        },
         "HOST": ".citizenscience.ch"
     }
 }
