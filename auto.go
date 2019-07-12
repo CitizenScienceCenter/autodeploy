@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/citizensciencecenter/autodeploy/modules"
@@ -20,7 +21,12 @@ func loadConfig() {
 	if err != nil {             // Handle errors reading the config file
 		panic(fmt.Errorf("Fatal error config file: %s", err))
 	}
-	fmt.Println(viper.Get("repo_dir"))
+	if viper.GetString("git.repo_dir") == "" {
+		cwd, err := os.Getwd()
+		modules.ErrHandler(err)
+		viper.Set("git.repo_dir", cwd)
+	}
+
 }
 
 func runHookServer() {
@@ -40,6 +46,8 @@ func hookHandler(w http.ResponseWriter, r *http.Request) {
 	src := fmt.Sprintf("%s:%s", hook.Repository.Name, hook.Branch)
 	rc := modules.HookBody{Source: src, Status: "SUCCESS", Stage: "Hook Triggered", Msg: "Hook started"}
 	ad := modules.AutoDeploy{Config: viper.GetViper(), HookBody: rc, Travis: hook}
+	ad.Dir = fmt.Sprintf("%s/%s", ad.Config.GetString("git.repo_dir"), hook.Repository.Name)
+	fmt.Println(ad.Dir)
 	if strings.Compare(hook.State, "passed") == 0 {
 		modules.Notify(ad)
 		w.WriteHeader(200)

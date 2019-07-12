@@ -9,8 +9,8 @@ the repo to deploy into Kubernetes using `envsubst` (not Helm)
 
 1. To host this somewhere in your infra that has access to the following:
     * Your Git repos
-    * Your Docker registry
-    * Your K8S instance
+    * Your Docker registry configured in the shell
+    * Your K8S instance (with kubectl configured)
 
 2. A webhook configured in your CI system 
 3. A `deploy` folder in your repo with files that match your branch names. i.e. `deploy/master.deploy`

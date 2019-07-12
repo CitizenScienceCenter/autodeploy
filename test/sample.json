@@ -1,8 +1,8 @@
 {
     "repository": {
-        "name": "wenker-site",
+        "name": "citizenscience.ch",
         "owner_name": "encima"
     },
-    "branch": "feature/elvira-changes",
+    "branch": "master",
     "state": "passed"
 }
