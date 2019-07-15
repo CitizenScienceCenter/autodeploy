@@ -32,7 +32,10 @@ func envCreate(t string, ad AutoDeploy) {
 	var envVar vars
 	//RunCommand("ls -ahl", &ad, ad.Dir, []string{}, "Dir", "LS")
 	fmt.Println(vip.AllKeys())
-	envVar.NAME = setVars(vip, "name", ad.Travis.Repository.Name).(string)
+	envVar.NAME = setVars(vip, "name", "").(string)
+	if envVar.NAME != "" {
+	    envVar.NAME += "."
+	}
 	envVar.PORT = int(setVars(vip, "port", 80).(float64))
 	envVar.NS = setVars(vip, "namespace", "c3s-test").(string)
 	envVar.TAG = fmt.Sprintf("%s/%s", ad.Config.GetString("docker.registry"), t)
