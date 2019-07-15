@@ -20,9 +20,11 @@ type vars struct {
 func envCreate(t string, ad AutoDeploy) {
 	vip := viper.New()
 	vip.SetConfigType("json")
-	vip.SetConfigFile(ad.Dir + "/.autodeploy.json")
+	vip.SetConfigFile(ad.Dir + ad.Config.GetString("k8s.deployfile"))
 	err :=vip.ReadInConfig()
-	ErrHandler(err)
+	ad.HookBody.Stage = "K8S Config"
+	ad.HookBody.Status = "FAILED"
+	ErrNotify(err, ad)
 
 	var host string
 
@@ -46,16 +48,19 @@ func envCreate(t string, ad AutoDeploy) {
 	yamlTemplate := template.Must(template.ParseFiles(ad.Config.GetString("k8s.yaml")))
 	var writer bytes.Buffer
 	err = yamlTemplate.Execute(&writer, envVar)
-	ErrHandler(err)
+	ad.HookBody.Stage = "K8S Create Deploy File"
+	ErrNotify(err, ad)
 	outFile := fmt.Sprintf("deployments/%s.deploy.yaml", ad.Travis.Repository.Name)
 	err = ioutil.WriteFile(outFile, writer.Bytes(), 0644)
-	ErrHandler(err)
+	ad.HookBody.Stage = "K8S Write Deploy File"
+	ErrNotify(err, ad)
 	deployCmd := fmt.Sprintf("kubectl apply -f deployments/%s.deploy.yaml", ad.Travis.Repository.Name)
 	cwd, err := os.Getwd()
-	ErrHandler(err)
+	ad.HookBody.Stage = "K8S Apply Deploy File"
+	ErrNotify(err, ad)
 	fmt.Println(cwd)
 	envs := make([]string, 1)
-	envs[0] = "KUBECONFIG=/home/encima/.kube/config"
+	envs[0] = ad.Config.GetString("k8s.config")
 	RunCommand(deployCmd, &ad, cwd, envs, "K8S", "Created YAML Deployment")
 	ad.HookBody.Status = "SUCCESS"
 	ad.HookBody.Msg = "DEPLOYED"

@@ -7,6 +7,7 @@
       "REPO_DIR": "/tmp"
     },
     "STDOUT": true,
+    "SEED": 989845,
     "WEBHOOK": {
       "URL": "https://chat.citizenscience.ch/hooks/evKcRdYH9HwCFE3Fa/ywRPgBLM9sg7Er4M3bXGDFSoWnenACDCe8JB2FqhZMFM2aGh"
     },
@@ -18,11 +19,13 @@
             "ING": true,
             "ING-WWW": true
         },
+        "DEPLOYFILE": "/.autodeploy",
         "SPACES": {
             "PROD": "c3s-prod",
             "STAGING": "c3s-staging",
-            "TEST": "c3s-testz"
+            "TEST": "c3s-test"
         },
-        "HOST": ".citizenscience.ch"
+        "HOST": ".citizenscience.ch",
+        "CONFIG": "KUBECONFIG=/home/encima/.kube/config"
     }
 }

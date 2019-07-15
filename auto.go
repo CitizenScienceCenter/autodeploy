@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"strings"
 
@@ -15,7 +16,12 @@ import (
 
 func runHookServer() {
 	r := mux.NewRouter()
-	r.HandleFunc("/", hookHandler).Methods("POST")
+	seed := viper.GetInt64("seed")
+	rand.Seed(seed)
+	routeID := rand.Uint64()
+	route := fmt.Sprintf("/%d", routeID)
+	fmt.Println("Your URL is: " + route)
+	r.HandleFunc(route, hookHandler).Methods("POST")
 	log.Fatal(http.ListenAndServe(":9898", r))
 }
 

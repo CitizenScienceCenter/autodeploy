@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -25,6 +26,16 @@ type TravisResp struct {
 type Repo struct {
 	Name      string
 	OwnerName string
+}
+
+// ErrNotify handles the error (trivially) AND sends a notification to the configured webhok
+func ErrNotify(err error, ad AutoDeploy) {
+	if err != nil {
+		ad.HookBody.Status = "ERROR"
+		ad.HookBody.Msg = err.Error()
+		Notify(ad)
+		log.Fatal(err)
+	}
 }
 
 // ErrHandler is the one function we all hate to write
@@ -56,32 +67,23 @@ func RunCommand(cmdString string, ad *AutoDeploy, dir string, vars []string, msg
 	cmdArgs := strings.Fields(cmdString)
 	fmt.Println(cmdString)
 	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
-	//stdout, _ := cmd.StdoutPipe()
+	stdout, _ := cmd.StdoutPipe()
 	if dir != "" {
 		cmd.Dir = dir
 	}
 	cmd.Env = vars
-	//err := cmd.Start()
-	//ErrHandler(err)
-	//if viper.GetBool("stdout") {
-	//	scanner := bufio.NewScanner(stdout)
-	//	for scanner.Scan() {
-	//		m := scanner.Text()
-	//		fmt.Println(m)
-	//		log.Printf(m)
-	//	}
-	//}
-	cmd.Wait()
-	out, err := cmd.Output()
-	fmt.Println(string(out))
-	fmt.Println(err)
-	if err != nil && ad != nil {
-		log.Fatal(err)
-		ad.HookBody.Status = "FAILED"
-		ad.HookBody.Stage = msg[0]
-		ad.HookBody.Msg = msg[1]
-		Notify(*ad)
+	err := cmd.Start()
+	ad.HookBody.Stage = msg[0]
+	ErrNotify(err, *ad)
+	if viper.GetBool("stdout") {
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			m := scanner.Text()
+			fmt.Println(m)
+			log.Printf(m)
+		}
 	}
+	cmd.Wait()
 	if len(msg) == 2 && ad != nil {
 		fmt.Println(msg[0])
 		ad.HookBody.Status = "SUCCESS"

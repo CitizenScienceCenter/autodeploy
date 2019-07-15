@@ -12,7 +12,8 @@ import (
 // InitRepo clones or updates a repo based on the branch info coming from Travis
 func InitRepo(n string, b string, ad AutoDeploy) {
 	fmt.Println(ad.Dir)
-	//ad.Dir = "/tmp/foo"
+	//RunCommand("bash -c eval `ssh-agent`", &ad, ad.Dir, []string{}, "")
+	//RunCommand("bash -c ssh-add", &ad, ad.Dir, []string{}, "")
 	repoURL := "https://github.com/citizensciencecenter/" + n
 	fmt.Println(repoURL)
 	r, err := git.PlainClone(ad.Dir, false, &git.CloneOptions{
