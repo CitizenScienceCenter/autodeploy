@@ -25,7 +25,7 @@
             "STAGING": "c3s-staging",
             "TEST": "c3s-test"
         },
-        "HOST": ".citizenscience.ch",
+        "HOST": "citizenscience.ch",
         "CONFIG": "KUBECONFIG=/home/ubuntu/.kube/config"
     }
 }
