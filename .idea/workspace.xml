@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a10a795f-10df-4c68-83d5-82ddfff2e2d4" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auto.go" beforeDir="false" afterPath="$PROJECT_DIR$/auto.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/conf.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/conf.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gin-bin" beforeDir="false" afterPath="$PROJECT_DIR$/gin-bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/git.go" beforeDir="false" afterPath="$PROJECT_DIR$/modules/git.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/k8s.go" beforeDir="false" afterPath="$PROJECT_DIR$/modules/k8s.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/utils.go" beforeDir="false" afterPath="$PROJECT_DIR$/modules/utils.go" afterDir="false" />
-    </list>
+    <list default="true" id="a10a795f-10df-4c68-83d5-82ddfff2e2d4" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,8 +64,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/modules/utils.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="252">
-              <caret line="43" column="22" selection-start-line="43" selection-start-column="22" selection-end-line="43" selection-end-column="22" />
+            <state relative-caret-position="794">
+              <caret line="66" column="40" selection-start-line="66" selection-start-column="40" selection-end-line="66" selection-end-column="40" />
             </state>
           </provider>
         </entry>
@@ -140,10 +132,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="240" />
-    <option name="y" value="135" />
-    <option name="width" value="1440" />
-    <option name="height" value="810" />
+    <option name="x" value="1278" />
+    <option name="y" value="1" />
+    <option name="width" value="1284" />
+    <option name="height" value="1441" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -209,7 +201,7 @@
     </option>
   </component>
   <component name="ToolWindowManager">
-    <frame x="958" y="1" width="964" height="1081" extended-state="6" />
+    <frame x="1278" y="1" width="1284" height="1441" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.81509846" />
@@ -314,8 +306,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/modules/utils.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="43" column="22" selection-start-line="43" selection-start-column="22" selection-end-line="43" selection-end-column="22" />
+        <state relative-caret-position="794">
+          <caret line="66" column="40" selection-start-line="66" selection-start-column="40" selection-end-line="66" selection-end-column="40" />
         </state>
       </provider>
     </entry>
