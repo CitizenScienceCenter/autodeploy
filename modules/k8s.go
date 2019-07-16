@@ -3,6 +3,7 @@ package modules
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"github.com/spf13/viper"
 	"html/template"
 	"io/ioutil"
@@ -15,6 +16,7 @@ type vars struct {
 	NS   string
 	HOST string
 	TAG  string
+	SUB  bool
 }
 
 func envCreate(t string, ad AutoDeploy) {
@@ -26,28 +28,42 @@ func envCreate(t string, ad AutoDeploy) {
 	ad.HookBody.Status = "FAILED"
 	ErrNotify(err, ad)
 
-	var host string
-
+	host := "-test"
+	vip.SetDefault("subdomain", true)
+	vip.SetDefault("port", 80)
+	vip.SetDefault("name", ad.Travis.Repository.Name)
 
 	var envVar vars
-	//RunCommand("ls -ahl", &ad, ad.Dir, []string{}, "Dir", "LS")
-	fmt.Println(vip.AllKeys())
-	envVar.NAME = setVars(vip, "name", "").(string)
-	if envVar.NAME != "" {
-	    envVar.NAME += "."
-	}
-	envVar.PORT = int(setVars(vip, "port", 80).(float64))
-	envVar.NS = setVars(vip, "namespace", "c3s-test").(string)
+	envVar.NAME = vip.GetString("name")
+	envVar.PORT = vip.GetInt("port")
 	envVar.TAG = fmt.Sprintf("%s/%s", ad.Config.GetString("docker.registry"), t)
-	switch envVar.NS {
-	case ad.Config.Get("k8s.spaces.prod"):
+	envVar.SUB = vip.GetBool("subdomain")
+
+	branchPath := strings.Split(ad.Travis.Branch, "/")
+	branch := branchPath[0]
+	if strings.Contains(branch, ad.Config.GetString("k8s.mapping.master")) {
 		host = ""
-	case ad.Config.Get("k8s.spaces.staging"):
-		host = "-staging"
-	case ad.Config.Get("k8s.spaces.test"):
-		host = "-test"
+		envVar.NS = "c3s-prod"
+	} else if strings.Contains(branch, ad.Config.GetString("k8s.mapping.develop")) {
+		host = "staging."
+		if envVar.SUB {
+			host = "-staging."
+		}
+		envVar.NS = "c3s-staging"
+	} else if strings.Contains(branch, ad.Config.GetString("k8s.mapping.feature")) {
+		host = "test."
+		if envVar.SUB {
+			host = "-test."
+		}
+		envVar.NS = "c3s-test"
 	}
-	envVar.HOST = fmt.Sprintf("%s%s%s", envVar.NAME, host, ad.Config.GetString("k8s.host"))
+
+	if envVar.SUB {
+		envVar.HOST = fmt.Sprintf("%s%s%s", envVar.NAME, host, ad.Config.GetString("k8s.host"))
+	} else {
+		envVar.HOST = fmt.Sprintf("%s%s", host, ad.Config.GetString("k8s.host"))
+	}
+
 	yamlTemplate := template.Must(template.ParseFiles(ad.Config.GetString("k8s.yaml")))
 	var writer bytes.Buffer
 	err = yamlTemplate.Execute(&writer, envVar)
@@ -69,12 +85,4 @@ func envCreate(t string, ad AutoDeploy) {
 	ad.HookBody.Msg = "DEPLOYED"
 	ad.HookBody.Stage = "Hook Finished"
 	Notify(ad)
-}
-
-func setVars(conf *viper.Viper, key string, defaultVal interface{}) interface{} {
-	if conf.InConfig(key) {
-		return conf.Get(key)
-	} else {
-		return defaultVal
-	}
 }
