@@ -3,11 +3,12 @@ package modules
 import (
 	"bytes"
 	"fmt"
-	"strings"
-	"github.com/spf13/viper"
 	"html/template"
 	"io/ioutil"
 	"os"
+	"strings"
+
+	"github.com/spf13/viper"
 )
 
 type vars struct {
@@ -23,7 +24,7 @@ func envCreate(t string, ad AutoDeploy) {
 	vip := viper.New()
 	vip.SetConfigType("json")
 	vip.SetConfigFile(ad.Dir + ad.Config.GetString("k8s.deployfile"))
-	err :=vip.ReadInConfig()
+	err := vip.ReadInConfig()
 	ad.HookBody.Stage = "K8S Config"
 	ad.HookBody.Status = "FAILED"
 	ErrNotify(err, ad)
