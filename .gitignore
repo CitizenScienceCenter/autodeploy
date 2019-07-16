@@ -1,4 +1,5 @@
 ran/
 deployments/
 .kube/
+.idea/*
 gin-bin

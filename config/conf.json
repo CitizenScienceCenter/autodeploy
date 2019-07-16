@@ -20,10 +20,11 @@
             "ING-WWW": true
         },
         "DEPLOYFILE": "/.autodeploy",
-        "SPACES": {
-            "PROD": "c3s-prod",
-            "STAGING": "c3s-staging",
-            "TEST": "c3s-test"
+        "MAPPING": {
+            "master": "c3s-prod",
+            "develop": "c3s-staging",
+            "feature": "c3s-test",
+            "hotfix": "c3s-test"
         },
         "HOST": "citizenscience.ch",
         "CONFIG": "KUBECONFIG=/home/ubuntu/.kube/config"
