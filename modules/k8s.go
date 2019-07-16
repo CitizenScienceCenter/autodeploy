@@ -29,7 +29,7 @@ func envCreate(t string, ad AutoDeploy) {
 	ad.HookBody.Status = "FAILED"
 	ErrNotify(err, ad)
 
-	host := "-test"
+	host := "-test."
 	vip.SetDefault("subdomain", true)
 	vip.SetDefault("port", 80)
 	vip.SetDefault("name", ad.Travis.Repository.Name)
@@ -39,19 +39,20 @@ func envCreate(t string, ad AutoDeploy) {
 	envVar.PORT = vip.GetInt("port")
 	envVar.TAG = fmt.Sprintf("%s/%s", ad.Config.GetString("docker.registry"), t)
 	envVar.SUB = vip.GetBool("subdomain")
-
+	envVar.NS = "c3s-test"
 	branchPath := strings.Split(ad.Travis.Branch, "/")
 	branch := branchPath[0]
-	if strings.Contains(branch, ad.Config.GetString("k8s.mapping.master")) {
+	fmt.Println(branch)
+	if branch == "master" {
 		host = ""
 		envVar.NS = "c3s-prod"
-	} else if strings.Contains(branch, ad.Config.GetString("k8s.mapping.develop")) {
+	} else if branch == "develop" {
 		host = "staging."
 		if envVar.SUB {
 			host = "-staging."
 		}
 		envVar.NS = "c3s-staging"
-	} else if strings.Contains(branch, ad.Config.GetString("k8s.mapping.feature")) {
+	} else if branch == "feature" {
 		host = "test."
 		if envVar.SUB {
 			host = "-test."
