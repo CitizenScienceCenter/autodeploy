@@ -33,19 +33,20 @@ func envCreate(t string, ad AutoDeploy) {
 	//RunCommand("ls -ahl", &ad, ad.Dir, []string{}, "Dir", "LS")
 	fmt.Println(vip.AllKeys())
 	envVar.NAME = setVars(vip, "name", "").(string)
-	if envVar.NAME != "" {
-	    envVar.NAME += "."
-	}
 	envVar.PORT = int(setVars(vip, "port", 80).(float64))
 	envVar.NS = setVars(vip, "namespace", "c3s-test").(string)
 	envVar.TAG = fmt.Sprintf("%s/%s", ad.Config.GetString("docker.registry"), t)
 	switch envVar.NS {
 	case ad.Config.Get("k8s.spaces.prod"):
-		host = ""
+		if envVar.NAME != "" {
+		    host = ""
+	        } else {
+	           host = "."
+	        }
 	case ad.Config.Get("k8s.spaces.staging"):
-		host = "-staging"
+		host = "-staging."
 	case ad.Config.Get("k8s.spaces.test"):
-		host = "-test"
+		host = "-test."
 	}
 	envVar.HOST = fmt.Sprintf("%s%s%s", envVar.NAME, host, ad.Config.GetString("k8s.host"))
 	yamlTemplate := template.Must(template.ParseFiles(ad.Config.GetString("k8s.yaml")))

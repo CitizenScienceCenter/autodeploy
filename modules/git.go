@@ -65,7 +65,7 @@ func InitRepo(n string, b string, ad AutoDeploy) {
 	})*/
 	fmt.Println("Updated submodules")
 	err = w.Pull(&git.PullOptions{RemoteName: "origin", RecurseSubmodules: git.DefaultSubmoduleRecursionDepth})
-	RunCommand("git submodule update --remote --recursive", &ad, ad.Dir, []string{}, "Submodules updated")
+	RunCommand("git submodule update --recursive", &ad, ad.Dir, []string{}, "Submodules updated")
 	ref, err := r.Head()
 	commit, err := r.CommitObject(ref.Hash())
 	fmt.Println(commit)
