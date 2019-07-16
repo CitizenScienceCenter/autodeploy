@@ -1,17 +1,16 @@
-FROM golang:1.12-alpine
-RUN mkdir /auto
-WORKDIR /auto
-COPY go.mod . # <- COPY go.mod and go.sum files to the workspace
+FROM golang:1.12 AS build-env
+RUN mkdir /autodeploy
+WORKDIR /autodeploy
+COPY go.mod .
 COPY go.sum .
 
-# Get dependancies - will also be cached if we won't change mod/sum
-RUN go mod download
-# COPY the source code as the last step
+RUN CGO_ENABLED=0 go mod download
 COPY . .
+RUN GO111MODULE=on CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o /go/bin/auto
 
-# Build the binary
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o /go/bin/auto 
-
-FROM scratch
+FROM alpine
+RUN mkdir -p /go/bin/config
+WORKDIR /go/bin
+COPY ./config/docker.json /go/bin/config/conf.json
 COPY --from=build-env /go/bin/auto /go/bin/auto
 ENTRYPOINT ["/go/bin/auto"]

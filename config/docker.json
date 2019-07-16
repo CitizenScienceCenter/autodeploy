@@ -1,0 +1,31 @@
+{
+    "DOCKER": {
+        "REGISTRY": "registry.citizenscience.ch"
+    },
+    "GIT": {
+      "BASE_URL": "https://github.com/citizensciencecenter",
+      "REPO_DIR": "/tmp"
+    },
+    "STDOUT": true,
+    "SEED": 989845,
+    "WEBHOOK": {
+      "URL": "https://chat.citizenscience.ch/hooks/evKcRdYH9HwCFE3Fa/ywRPgBLM9sg7Er4M3bXGDFSoWnenACDCe8JB2FqhZMFM2aGh"
+    },
+    "K8S": {
+        "YAML": "./env-deploy.yaml",
+        "DEPLOY": {
+            "DEP": true,
+            "SVC": true,
+            "ING": true,
+            "ING-WWW": true
+        },
+        "DEPLOYFILE": "/.autodeploy",
+        "SPACES": {
+            "PROD": "c3s-prod",
+            "STAGING": "c3s-staging",
+            "TEST": "c3s-test"
+        },
+        "HOST": ".citizenscience.ch",
+        "CONFIG": "KUBECONFIG=.kube"
+    }
+}
