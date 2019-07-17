@@ -44,7 +44,11 @@ func envCreate(t string, ad AutoDeploy) {
 	branch := branchPath[0]
 	fmt.Println(branch)
 	if branch == "master" {
-		host = ""
+		if envVar.SUB {
+		        host = "."
+		}else{
+			host = ""
+		}
 		envVar.NS = "c3s-prod"
 	} else if branch == "develop" {
 		host = "staging."
