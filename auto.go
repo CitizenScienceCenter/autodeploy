@@ -21,10 +21,15 @@ func runHookServer() {
 	routeID := rand.Uint64()
 	route := fmt.Sprintf("/%d", routeID)
 	fmt.Println("Your URL is: " + route)
+	r.HandleFunc("/", upHandler).Methods("GET")
 	r.HandleFunc(route, hookHandler).Methods("POST")
 	log.Fatal(http.ListenAndServe(":9898", r))
 }
 
+func upHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
+	w.Write([]byte("Autodeploy!\n"))
+}
 func hookHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO check token is matching
 	body, err := ioutil.ReadAll(r.Body)
