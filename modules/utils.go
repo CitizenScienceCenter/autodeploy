@@ -20,6 +20,7 @@ type TravisResp struct {
 	Commit     string
 	BuildURL   string
 	CompareURL string
+	GS         string
 	Number     int
 }
 

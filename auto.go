@@ -47,7 +47,7 @@ func hookHandler(w http.ResponseWriter, r *http.Request) {
 		modules.Notify(ad)
 		w.WriteHeader(200)
 		w.Write([]byte("{data: Hook started}"))
-		go modules.InitRepo(hook.Repository.Name, hook.Branch, ad)
+		go modules.InitRepo(hook.Repository.Name, hook.Branch, hook.GS, ad)
 	} else {
 		ad.HookBody.Stage = "Travis"
 		ad.HookBody.Status = "FAILED"

@@ -10,7 +10,7 @@ import (
 )
 
 // InitRepo clones or updates a repo based on the branch info coming from Travis
-func InitRepo(n string, b string, ad AutoDeploy) {
+func InitRepo(n string, b string, gs string, ad AutoDeploy) {
 	fmt.Println(ad.Dir)
 	//RunCommand("bash -c eval `ssh-agent`", &ad, ad.Dir, []string{}, "")
 	//RunCommand("bash -c ssh-add", &ad, ad.Dir, []string{}, "")
@@ -77,6 +77,8 @@ func InitRepo(n string, b string, ad AutoDeploy) {
 	ad.HookBody.Stage = "Git Pull"
 	ad.HookBody.Status = "SUCCESS"
 	Notify(ad)
-	RunCommandInput("git secret reveal -f", ad.Config.GetString("gs"))
+	if len(gs) > 0 {
+		RunCommandInput("git secret reveal -f", gs)
+	}
 	go dockerBuild(tag, ad)
 }
