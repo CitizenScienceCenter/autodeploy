@@ -77,5 +77,7 @@ func InitRepo(n string, b string, ad AutoDeploy) {
 	ad.HookBody.Stage = "Git Pull"
 	ad.HookBody.Status = "SUCCESS"
 	Notify(ad)
+
+
 	go dockerBuild(tag, ad)
 }
