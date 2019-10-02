@@ -3,6 +3,7 @@ package modules
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -91,4 +92,25 @@ func RunCommand(cmdString string, ad *AutoDeploy, dir string, vars []string, msg
 		ad.HookBody.Msg = msg[1]
 		Notify(*ad)
 	}
+}
+
+func RunCommandInput(cmdString string, inputString string) {
+	cmdArgs := strings.Fields(cmdString)
+	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	go func() {
+		defer stdin.Close()
+		io.WriteString(stdin, inputString)
+	}()
+
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%s\n", out)
 }

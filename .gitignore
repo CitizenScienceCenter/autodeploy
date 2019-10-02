@@ -3,3 +3,5 @@ deployments/
 .kube/
 .idea/*
 gin-bin
+.gitsecret/keys/random_seed
+!*.secret

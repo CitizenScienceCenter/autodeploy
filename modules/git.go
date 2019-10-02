@@ -77,5 +77,6 @@ func InitRepo(n string, b string, ad AutoDeploy) {
 	ad.HookBody.Stage = "Git Pull"
 	ad.HookBody.Status = "SUCCESS"
 	Notify(ad)
+	RunCommandInput("git secret reveal -f", ad.Config.GetString("gs"))
 	go dockerBuild(tag, ad)
 }
