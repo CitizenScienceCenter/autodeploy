@@ -6,3 +6,4 @@ gin-bin
 .gitsecret/keys/random_seed
 !*.secret
 auto
+config/conf.json
