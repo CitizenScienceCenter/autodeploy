@@ -5,7 +5,7 @@ import (
 )
 
 func dockerBuild(t string, ad AutoDeploy) {
-	dockerCmd := fmt.Sprintf("docker build -t %s/%s .", ad.Config.GetString("docker.registry"), t)
+	dockerCmd := fmt.Sprintf("docker build --network=host -t %s/%s .", ad.Config.GetString("docker.registry"), t)
 	fmt.Println(dockerCmd)
 	RunCommand(dockerCmd, &ad, ad.Dir, []string{}, "Docker Build", "Image built successfully")
 	go dockerPush(t, ad)

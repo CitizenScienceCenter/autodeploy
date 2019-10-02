@@ -18,6 +18,7 @@ type vars struct {
 	HOST string
 	TAG  string
 	SUB  bool
+	DEPLOYFILE string
 }
 
 func envCreate(t string, ad AutoDeploy) {
@@ -33,7 +34,7 @@ func envCreate(t string, ad AutoDeploy) {
 	vip.SetDefault("subdomain", true)
 	vip.SetDefault("port", 80)
 	vip.SetDefault("name", ad.Travis.Repository.Name)
-
+	vip.SetDefault("deployfile", ad.Config.GetString("k8s.yaml"))
 	var envVar vars
 	envVar.NAME = vip.GetString("name")
 	envVar.PORT = vip.GetInt("port")
@@ -43,25 +44,33 @@ func envCreate(t string, ad AutoDeploy) {
 	branchPath := strings.Split(ad.Travis.Branch, "/")
 	branch := branchPath[0]
 	fmt.Println(branch)
-	if branch == "master" {
+	if vip.IsSet("ns") {
+		envVar.NS = fmt.Sprintf("%s-%s", "c3s", vip.GetString("ns"))
+		host = vip.GetString("ns")
 		if envVar.SUB {
-		        host = "."
-		}else{
-			host = ""
+			host = fmt.Sprintf("-%s", vip.GetString("ns"))
 		}
-		envVar.NS = "c3s-prod"
-	} else if branch == "develop" {
-		host = "staging."
-		if envVar.SUB {
-			host = "-staging."
+	} else {
+		if branch == "master" {
+			if envVar.SUB {
+				host = "."
+			}else{
+				host = ""
+			}
+			envVar.NS = "c3s-prod"
+		} else if branch == "develop" {
+			host = "staging."
+			if envVar.SUB {
+				host = "-staging."
+			}
+			envVar.NS = "c3s-staging"
+		} else if branch == "feature" {
+			host = "test."
+			if envVar.SUB {
+				host = "-test."
+			}
+			envVar.NS = "c3s-test"
 		}
-		envVar.NS = "c3s-staging"
-	} else if branch == "feature" {
-		host = "test."
-		if envVar.SUB {
-			host = "-test."
-		}
-		envVar.NS = "c3s-test"
 	}
 
 	if envVar.SUB {
@@ -70,7 +79,7 @@ func envCreate(t string, ad AutoDeploy) {
 		envVar.HOST = fmt.Sprintf("%s%s", host, ad.Config.GetString("k8s.host"))
 	}
 
-	yamlTemplate := template.Must(template.ParseFiles(ad.Config.GetString("k8s.yaml")))
+	yamlTemplate := template.Must(template.ParseFiles(vip.GetString("deployfile")))
 	var writer bytes.Buffer
 	err = yamlTemplate.Execute(&writer, envVar)
 	ad.HookBody.Stage = "K8S Create Deploy File"

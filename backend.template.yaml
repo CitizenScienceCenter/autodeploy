@@ -1,0 +1,72 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{.NAME}}
+  namespace: {{.NS}}
+  labels:
+    app: {{.NAME}}-app
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: {{.NAME}}-app
+  template:
+    metadata:
+      labels:
+        app: {{.NAME}}-app
+    spec:
+      containers:
+      - name: api
+        imagePullPolicy: Always
+        image: {{.TAG}} 
+        command: ["uwsgi", "--http", ":9000", "--wsgi-file", "uwsgi.py", "--http-processes", "4"]
+        env:
+        - name: CC_ENV
+          value: 'config/staging.cfg'
+        ports:
+        - containerPort: 9000
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.NAME}}-service
+  namespace: {{.NS}}
+spec:
+  selector:
+    app: {{.NAME}}-app
+  ports:
+    - name: http
+      protocol: 'TCP'
+      port: 80
+      targetPort: 9000
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: api-ingress
+  namespace: {{.NS}}
+  annotations:
+    #nginx.ingress.kubernetes.io/rewrite-target: /$2
+    #nginx.ingress.kubernetes.io/configuration-snippet: |
+    #  more_set_headers "server: hide";
+    #  more_set_headers "X-Content-Type-Options: nosniff";
+    #  more_set_headers "X-Frame-Options: DENY";
+    #  more_set_headers "X-Xss-Protection: 1";
+    kubernetes.io/tls-acme: "true"
+spec:
+  tls:
+  - hosts:
+    - api-staging.citizenscience.ch
+    secretName: api-staging.citizenscience.ch
+  rules:
+  - host: api-staging.citizenscience.ch
+    http:
+      paths:
+      - path: "/"
+        backend:
+          serviceName: {{.NAME}}-service
+          servicePort: http
